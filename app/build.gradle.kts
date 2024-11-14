@@ -1,8 +1,12 @@
+import com.android.utils.TraceUtils.simpleId
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
+    id("com.google.dagger.hilt.android")
+    id("kotlin-kapt")
 }
 
 
@@ -25,7 +29,7 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "BASE_URL", "\"https://api.coincap.io/v2/proguard\"")
+            buildConfigField("String", "BASE_URL", "\"https://api.coincap.io/v2/\"")
         }
         release {
             isMinifyEnabled = false
@@ -34,7 +38,7 @@ android {
                 "proguard-rules.pro"
             )
 
-            buildConfigField("String", "BASE_URL", "\"https://api.coincap.io/v2/proguard\"")
+            buildConfigField("String", "BASE_URL", "\"https://api.coincap.io/v2/\"")
         }
     }
     compileOptions {
@@ -66,14 +70,16 @@ dependencies {
 
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 
-    implementation(libs.bundles.koin)
-
     implementation(libs.bundles.ktor)
 
     testImplementation(libs.junit)
+
+    implementation(libs.bundles.dagger.hilt)
+    kapt(libs.bundles.dagger.hilt.kapt)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+
 }
