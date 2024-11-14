@@ -4,13 +4,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.plcoding.cryptotracker.core.domain.util.onError
 import com.plcoding.cryptotracker.core.domain.util.onSuccess
+import com.plcoding.cryptotracker.crypto.domain.Coin
 import com.plcoding.cryptotracker.crypto.domain.CoinDataSource
 import com.plcoding.cryptotracker.crypto.presentation.model.toCoinUi
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -30,6 +33,9 @@ class CoinListViewModel @Inject constructor(
             SharingStarted.WhileSubscribed(5000L),
             CoinListState()
         )
+
+    private val _eventChannel = Channel<CoinListEvent>()
+    val eventChannel = _eventChannel.receiveAsFlow()
 
     fun onAction(action: CoinListAction) {
         when(action) {
@@ -64,6 +70,8 @@ class CoinListViewModel @Inject constructor(
                             isLoading = false
                         )
                     }
+
+                    _eventChannel.send(CoinListEvent.Error(error))
                 }
         }
     }
